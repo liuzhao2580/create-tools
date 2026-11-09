@@ -1,0 +1,22 @@
+{
+  "source": "https://github.com/leehack/llama-web-bridge-assets/releases/tag/v0.1.54",
+  "version": "v0.1.54",
+  "files": {
+    "llama_webgpu_bridge.js": {
+      "bytes": 283007,
+      "sha256": "994a81c48c0f4c43d39bed98a671e873115d8a8eb1be93c0ea62a09aff9834ad"
+    },
+    "llama_webgpu_bridge_worker.js": {
+      "bytes": 257,
+      "sha256": "47bbfa0fe897e708455b9497e9aa41d2e94489c329300c33b12936fb3169deca"
+    },
+    "llama_webgpu_core_mem64.js": {
+      "bytes": 142469,
+      "sha256": "7cbc55d7e7d5bce60726d17b2c8c260387fc8a1a439e4e98296d5b26b5efc17e"
+    },
+    "llama_webgpu_core_mem64.wasm": {
+      "bytes": 9985188,
+      "sha256": "7038c99b95021de0eb81c6b344bb0407370fb9d54ab48565910d677f1ac30dbd"
+    }
+  }
+}
