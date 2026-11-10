@@ -106,3 +106,24 @@ Python 需有 `mlx-audio`、`mlx`、`numpy`、`soundfile`，系统需有 `ffmpeg
 
 ## 标题模板（2026-11-07）
 导航入口：#/titles。独立分类侧栏：二十四节气、正常文章标题、医疗饮食科普、心理与生活。首批8种模板，支持编辑主标题（最多3行）、副标题、标签，草稿保存在当前浏览器，导出1800×766 PNG。节气选择提供24个名称，不自动填写公历与农历日期。霜降用原创水墨背景，其他节气使用四季留白版；橙色手绘模板保留用户确认样例。模板定义与渲染位于src/TitleStudio.tsx，素材位于public/title-templates。用户参考截图归档于.local/title-template-references。
+
+## 配置文件怎么改
+
+配置结构参照 Vite 官方 React + TypeScript 模板，保留本项目需要的本机配音插件。
+
+| 文件 | 职责 / 常用修改 |
+| --- | --- |
+| `vite.config.ts` | Vite 插件、`base` 部署路径、`server` 开发端口、`preview` 预览端口 |
+| `tsconfig.json` | 只引用 app / node 两份配置，通常不用改 |
+| `tsconfig.app.json` | `src` 前端代码的 TypeScript 检查，包含 DOM 类型 |
+| `tsconfig.node.json` | Vite / Vitest 配置与 `server` 插件的类型检查，使用 Node 类型 |
+| `vitest.config.ts` | 单元测试文件范围、测试环境；与网页开发配置独立 |
+
+- `npm run dev`：开发地址 `http://127.0.0.1:5174`。修改 `server.port` 更换端口；`strictPort: true` 表示占用时直接报错，避免静默换端口。
+- `npm run build`：先执行两份 TypeScript 配置的检查，再构建到 `dist`。
+- `npm run preview`：在 `http://127.0.0.1:4173` 查看已构建页面，不是开发服务器。
+- `npm test`：执行独立的 Vitest 配置，不会启动配音服务。
+- `base: './'` 是本项目的相对资源路径配置；不是所有 Vite 项目都必须设置。按部署需求修改。
+- `edgeSpeechPlugin` 和 `subtitleSpeechPlugin` 是项目自带的本机 API 插件，不是 Vite 官方内置插件。移除后，微软配音和字幕配音的本机接口不可用。
+- 两份 TypeScript 配置保留现有 ES2022、strict 和 bundler 模块解析策略，不为照抄模板改变运行目标。
+- `*.tsbuildinfo` 是自动生成的增量检查缓存，不是需要编辑的配置；现统一放入 `node_modules/.tmp`，已被 Git 忽略。
