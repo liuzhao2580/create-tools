@@ -4,7 +4,7 @@ import CoverStudio from './CoverStudio'
 import SubtitleStudio from './SubtitleStudio'
 import { StudioAlert, StudioButton, StudioCard, StudioInput, VoiceMode, VoiceSelect, VoiceSlider } from './ui/antd'
 import { useEffect, useRef, useState } from 'react'
-import { ArrowDownToLine, ArrowRight, AudioLines, Check, CheckCircle2, ChevronRight, CircleHelp, Cpu, FileText, HardDrive, Headphones, Info, LoaderCircle, Menu, RotateCcw, Settings2, ShieldCheck, SlidersHorizontal, Sparkles, Square, Trash2, Upload, X } from 'lucide-react'
+import { ArrowDownToLine, ArrowRight, AudioLines, LayoutGrid, Check, CheckCircle2, ChevronRight, CircleHelp, Cpu, FileText, HardDrive, Headphones, Info, LoaderCircle, Menu, RotateCcw, Settings2, ShieldCheck, SlidersHorizontal, Sparkles, Square, Trash2, Upload, X } from 'lucide-react'
 import { voiceEngine } from './voice-engine'
 import { generatePresetVoice, voices } from './edge-voice'
 import type { EngineProgress, EngineStatus, SupportInfo, VoiceResult } from './engine-types'
@@ -162,7 +162,7 @@ export default function App() {
     if (voiceMode === 'clone' && support?.supportsReferenceText && !referenceText.trim()) { setError('请填写参考音频中准确说出的文字。'); return }
     const operation = new AbortController()
     controller.current = operation
-    const script = preview ? '你好，欢迎使用声作。这是我的声音，愿每一段文字都能被听见。' : text.trim()
+    const script = preview ? '你好，欢迎使用创作者工具。这是我的声音，愿每一段文字都能被听见。' : text.trim()
     setPreviewing(preview)
     const filename = (preview ? `${voices.find(v => v.id === selectedVoice)?.name}试听` : preferences.filename).trim().replace(/[\/:*?"<>|]/g, '_') || '我的配音'
     setError(''); setNotice(''); setStatus('generating')
@@ -222,23 +222,27 @@ export default function App() {
       <a className="skip-link" href="#main-content" onClick={(event) => { event.preventDefault(); document.getElementById('main-content')?.focus() }}>跳到主要内容</a>
       {mobileNav && <button className="nav-scrim" aria-label="关闭导航" onClick={() => setMobileNav(false)} />}
       <aside className={`sidebar ${mobileNav ? 'is-open' : ''}`} aria-label="工具导航">
-        <a href="#/voice" className="brand"><span className="brand-mark"><AudioLines size={26} strokeWidth={2.1} /></span><span>声作<span className="brand-caption">创作工具箱</span></span></a>
+        <a href="#/voice" className="brand"><span className="brand-mark"><LayoutGrid size={26} strokeWidth={2.1} /></span><span>创作者工具<span className="brand-caption">CREATOR TOOLS</span></span></a>
         <button className="mobile-nav-close icon-button" onClick={() => setMobileNav(false)} aria-label="关闭导航"><X size={20} /></button>
-        <div className="sidebar-section-label">公众号专栏与创作工具</div>
+
         <nav className="tool-navigation">
-          {toolRegistry.map((tool) => <a key={tool.id} href={`#${tool.route}`} className={`nav-link ${route === tool.route ? 'active' : ''}`} aria-current={route === tool.route ? 'page' : undefined}><tool.icon size={19} /><span>{tool.name}</span>{route === tool.route && <span className="nav-dot" />}</a>)}
+          {[...new Set(toolRegistry.map(tool => tool.group))].map(group => <section className="nav-group" key={group} aria-label={group}>
+            <h2 className="sidebar-section-label">{group}</h2>
+            {toolRegistry.filter(tool => tool.group === group).map(tool => <a key={tool.id} href={`#${tool.route}`} className={`nav-link ${route === tool.route ? 'active' : ''}`} aria-current={route === tool.route ? 'page' : undefined}><tool.icon size={19} /><span>{tool.name}</span>{route === tool.route && <span className="nav-dot" />}</a>)}
+          </section>)}
+          <h2 className="sidebar-section-label">系统</h2>
           <a href="#/settings" className={`nav-link ${settingsRoute ? 'active' : ''}`} aria-current={settingsRoute ? 'page' : undefined}><Settings2 size={19} /><span>模型与设置</span>{settingsRoute && <span className="nav-dot" />}</a>
         </nav>
         <div className="sidebar-bottom">
-          <div className="local-card"><span className="local-card-icon"><ShieldCheck size={20} /></span><strong>在你的设备上创作</strong><p>预设音色在线合成，<br />音色克隆在本机运行。</p><a href="#/settings">了解本地运行 <ArrowRight size={13} /></a></div>
+          <div className="local-card"><span className="local-card-icon"><ShieldCheck size={20} /></span><strong>在你的设备上创作</strong><p>排版、封面与配音，<br />让创作更顺手。</p><a href="#/settings">了解本地运行 <ArrowRight size={13} /></a></div>
           <div className="sidebar-footer"><span className="tiny-mark"><AudioLines size={13} /></span> 少一点重复，多一点创作 <span>v0.1</span></div>
         </div>
       </aside>
 
       <div className="workspace">
-        <header className="topbar"><div className="breadcrumbs"><button className="mobile-menu icon-button" aria-label="打开导航" aria-expanded={mobileNav} onClick={() => setMobileNav(true)}><Menu size={20} /></button><span>创作工具箱</span><ChevronRight size={13} /><strong>{articleRoute ? '公众号排版' : titleRoute ? '标题模板' : coverRoute ? '封面编辑' : settingsRoute ? '模型与设置' : subtitlesRoute ? '字幕配音' : '文案配音'}</strong></div><a className={`engine-pill ${modelReady ? 'connected' : ''}`} href="#/settings"><span className={`status-dot ${busy ? 'working' : ''}`} />{articleRoute ? '公众号排版 · 本地处理' : titleRoute ? '标题模板 · 本地处理' : coverRoute ? '封面编辑 · 本地处理' : subtitlesRoute ? '已确认音色 · 本机合成' : modelStateLabel}<ChevronRight size={12} /></a></header>
+        <header className="topbar"><div className="breadcrumbs"><button className="mobile-menu icon-button" aria-label="打开导航" aria-expanded={mobileNav} onClick={() => setMobileNav(true)}><Menu size={20} /></button><span>创作者工具</span><ChevronRight size={13} /><strong>{articleRoute ? '公众号排版' : titleRoute ? '标题模板' : coverRoute ? '封面编辑' : settingsRoute ? '模型与设置' : subtitlesRoute ? '字幕配音' : '文案配音'}</strong></div><a className={`engine-pill ${modelReady ? 'connected' : ''}`} href="#/settings"><span className={`status-dot ${busy ? 'working' : ''}`} />{articleRoute ? '公众号排版 · 本地处理' : titleRoute ? '标题模板 · 本地处理' : coverRoute ? '封面编辑 · 本地处理' : subtitlesRoute ? '已确认音色 · 本机合成' : modelStateLabel}<ChevronRight size={12} /></a></header>
         <main id="main-content" tabIndex={-1}>
-          <div className="page-heading"><div><div className="eyebrow">声作 STUDIO <span>/ {articleRoute ? 'ARTICLE LAYOUT' : titleRoute ? 'TITLE TEMPLATES' : coverRoute ? 'COVER EDITOR' : settingsRoute ? 'PREFERENCES' : subtitlesRoute ? 'SUBTITLE TO SPEECH' : 'TEXT TO SPEECH'}</span></div><h1>{articleRoute ? '公众号排版' : titleRoute ? '标题模板' : coverRoute ? '封面编辑' : settingsRoute ? '模型与设置' : subtitlesRoute ? '字幕配音' : '配音工作台'}</h1><p>{articleRoute ? '编辑内容，预览排版，复制到公众号正文。' : titleRoute ? '按主题挑选模板，改好标题，导出公众号横幅。' : coverRoute ? '给封面加一句话，调好字体，保存你的作品。' : settingsRoute ? '管理本地克隆模型与存储；微软预设音色无需下载。' : subtitlesRoute ? '文字跟着画面，声音跟着时间。' : '写好文案，调好声音，生成你的下一段配音。'}</p></div><span className="local-badge"><span className="status-dot" /> 本地工作空间</span></div>
+          <div className="page-heading"><div><div className="eyebrow">创作者工具 STUDIO <span>/ {articleRoute ? 'ARTICLE LAYOUT' : titleRoute ? 'TITLE TEMPLATES' : coverRoute ? 'COVER EDITOR' : settingsRoute ? 'PREFERENCES' : subtitlesRoute ? 'SUBTITLE TO SPEECH' : 'TEXT TO SPEECH'}</span></div><h1>{articleRoute ? '公众号排版' : titleRoute ? '标题模板' : coverRoute ? '封面编辑' : settingsRoute ? '模型与设置' : subtitlesRoute ? '字幕配音' : '配音工作台'}</h1><p>{articleRoute ? '编辑内容，预览排版，复制到公众号正文。' : titleRoute ? '按主题挑选模板，改好标题，导出公众号横幅。' : coverRoute ? '给封面加一句话，调好字体，保存你的作品。' : settingsRoute ? '管理本地克隆模型与存储；微软预设音色无需下载。' : subtitlesRoute ? '文字跟着画面，声音跟着时间。' : '写好文案，调好声音，生成你的下一段配音。'}</p></div><span className="local-badge"><span className="status-dot" /> 本地工作空间</span></div>
 
           {error && <StudioAlert message={error} type="error" onClose={() => setError('')} />}
           {notice && <StudioAlert message={notice} type="success" onClose={() => setNotice('')} />}
@@ -269,7 +273,7 @@ export default function App() {
             </div>
             <div className="bottom-hint"><Info size={14} /><span>小建议：先用一小段文案试听，确认发音和节奏，再生成完整内容。</span></div>
           </>}
-          <footer className="page-footer"><span>声作 · 为创作留一点空间</span><a href="#/settings">本地运行说明 <ArrowRight size={12} /></a></footer>
+          <footer className="page-footer"><span>创作者工具 · 为创作留一点空间</span><a href="#/settings">本地运行说明 <ArrowRight size={12} /></a></footer>
         </main>
       </div>
     </div>
