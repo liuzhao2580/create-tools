@@ -1,5 +1,4 @@
 import ArticleStudio from './ArticleStudio'
-import TitleStudio from './TitleStudio'
 import CoverStudio from './CoverStudio'
 import SubtitleStudio from './SubtitleStudio'
 import { StudioAlert, StudioButton, StudioCard, StudioInput, VoiceMode, VoiceSelect, VoiceSlider } from './ui/antd'
@@ -29,7 +28,7 @@ function readPreferences(): Preferences {
 function readDraft() {
   try { return localStorage.getItem(DRAFT_KEY) || '' } catch { return '' }
 }
-function getRoute() { return window.location.hash.slice(1) || '/voice' }
+function getRoute() { return (window.location.hash.slice(1) === '/titles' ? '/article' : window.location.hash.slice(1)) || '/voice' }
 function readableBytes(bytes: number) {
   if (bytes >= 1024 ** 3) return `${(bytes / 1024 ** 3).toFixed(1)} GB`
   return `${Math.round(bytes / 1024 ** 2)} MB`
@@ -79,7 +78,6 @@ export default function App() {
   const validation = text.trim() ? validateText(text, limit) : null
   const settingsRoute = route === '/settings'
   const articleRoute = route === '/article'
-  const titleRoute = route === '/titles'
   const coverRoute = route === '/cover'
   const subtitlesRoute = route === '/subtitles'
   const knownRoute = settingsRoute || toolRegistry.some((tool) => tool.route === route)
@@ -240,15 +238,15 @@ export default function App() {
       </aside>
 
       <div className="workspace">
-        <header className="topbar"><div className="breadcrumbs"><button className="mobile-menu icon-button" aria-label="打开导航" aria-expanded={mobileNav} onClick={() => setMobileNav(true)}><Menu size={20} /></button><span>创作者工具</span><ChevronRight size={13} /><strong>{articleRoute ? '公众号排版' : titleRoute ? '标题模板' : coverRoute ? '封面编辑' : settingsRoute ? '模型与设置' : subtitlesRoute ? '字幕配音' : '文案配音'}</strong></div><a className={`engine-pill ${modelReady ? 'connected' : ''}`} href="#/settings"><span className={`status-dot ${busy ? 'working' : ''}`} />{articleRoute ? '公众号排版 · 本地处理' : titleRoute ? '标题模板 · 本地处理' : coverRoute ? '封面编辑 · 本地处理' : subtitlesRoute ? '已确认音色 · 本机合成' : modelStateLabel}<ChevronRight size={12} /></a></header>
+        <header className="topbar"><div className="breadcrumbs"><button className="mobile-menu icon-button" aria-label="打开导航" aria-expanded={mobileNav} onClick={() => setMobileNav(true)}><Menu size={20} /></button><span>创作者工具</span><ChevronRight size={13} /><strong>{articleRoute ? '公众号排版' : coverRoute ? '封面编辑' : settingsRoute ? '模型与设置' : subtitlesRoute ? '字幕配音' : '文案配音'}</strong></div><a className={`engine-pill ${modelReady ? 'connected' : ''}`} href="#/settings"><span className={`status-dot ${busy ? 'working' : ''}`} />{articleRoute ? '公众号排版 · 本地处理' : coverRoute ? '封面编辑 · 本地处理' : subtitlesRoute ? '已确认音色 · 本机合成' : modelStateLabel}<ChevronRight size={12} /></a></header>
         <main id="main-content" tabIndex={-1}>
-          <div className="page-heading"><div><div className="eyebrow">创作者工具 STUDIO <span>/ {articleRoute ? 'ARTICLE LAYOUT' : titleRoute ? 'TITLE TEMPLATES' : coverRoute ? 'COVER EDITOR' : settingsRoute ? 'PREFERENCES' : subtitlesRoute ? 'SUBTITLE TO SPEECH' : 'TEXT TO SPEECH'}</span></div><h1>{articleRoute ? '公众号排版' : titleRoute ? '标题模板' : coverRoute ? '封面编辑' : settingsRoute ? '模型与设置' : subtitlesRoute ? '字幕配音' : '配音工作台'}</h1><p>{articleRoute ? '编辑内容，预览排版，复制到公众号正文。' : titleRoute ? '按主题挑选模板，改好标题，导出公众号横幅。' : coverRoute ? '给封面加一句话，调好字体，保存你的作品。' : settingsRoute ? '管理本地克隆模型与存储；微软预设音色无需下载。' : subtitlesRoute ? '文字跟着画面，声音跟着时间。' : '写好文案，调好声音，生成你的下一段配音。'}</p></div><span className="local-badge"><span className="status-dot" /> 本地工作空间</span></div>
+          <div className="page-heading"><div><div className="eyebrow">创作者工具 STUDIO <span>/ {articleRoute ? 'ARTICLE LAYOUT' : coverRoute ? 'COVER EDITOR' : settingsRoute ? 'PREFERENCES' : subtitlesRoute ? 'SUBTITLE TO SPEECH' : 'TEXT TO SPEECH'}</span></div><h1>{articleRoute ? '公众号排版' : coverRoute ? '封面编辑' : settingsRoute ? '模型与设置' : subtitlesRoute ? '字幕配音' : '配音工作台'}</h1><p>{articleRoute ? '编辑内容，预览排版，复制到公众号正文。' : coverRoute ? '给封面加一句话，调好字体，保存你的作品。' : settingsRoute ? '管理本地克隆模型与存储；微软预设音色无需下载。' : subtitlesRoute ? '文字跟着画面，声音跟着时间。' : '写好文案，调好声音，生成你的下一段配音。'}</p></div><span className="local-badge"><span className="status-dot" /> 本地工作空间</span></div>
 
           {error && <StudioAlert message={error} type="error" onClose={() => setError('')} />}
           {notice && <StudioAlert message={notice} type="success" onClose={() => setNotice('')} />}
           {progress && settingsRoute && <div className="operation-panel"><OperationProgress progress={progress} /><StudioButton className="text-button" onClick={cancel}><Square size={12} />取消</StudioButton></div>}
 
-          {!knownRoute ? <StudioCard className="card not-found"><CircleHelp size={35} /><h2>这个工具还不存在</h2><p>从左侧选择一个已上线的创作工具。</p><a className="button primary" href="#/voice">返回配音工作台</a></StudioCard> : articleRoute ? <ArticleStudio /> : titleRoute ? <TitleStudio /> : coverRoute ? <CoverStudio /> : subtitlesRoute ? <SubtitleStudio /> : settingsRoute ? <div className="settings-layout">
+          {!knownRoute ? <StudioCard className="card not-found"><CircleHelp size={35} /><h2>这个工具还不存在</h2><p>从左侧选择一个已上线的创作工具。</p><a className="button primary" href="#/voice">返回配音工作台</a></StudioCard> : articleRoute ? <ArticleStudio /> : coverRoute ? <CoverStudio /> : subtitlesRoute ? <SubtitleStudio /> : settingsRoute ? <div className="settings-layout">
             <StudioCard className="card settings-card"><div className="card-heading"><div className="section-icon"><Cpu size={20} /></div><div><h2>本地配音模型</h2><p>首次使用需要下载，之后可复用浏览器缓存。</p></div></div><dl className="details-list"><div><dt>配音引擎</dt><dd>{support?.engineName || '正在检查…'}</dd></div><div><dt>模型</dt><dd>{support?.modelName || '正在检查…'}</dd></div><div><dt>首次下载</dt><dd>{support?.downloadLabel || '正在检查…'}</dd></div><div><dt>运行状态</dt><dd><span className={`inline-status ${modelReady ? 'is-ready' : ''}`}><span className="status-dot" />{modelStateLabel}</span></dd></div></dl><div className="settings-actions"><StudioButton className="button primary" disabled={!support?.supported || busy || clearingCache || modelReady} onClick={() => void loadModel()}>{busy && status !== 'generating' ? <LoaderCircle size={16} className="spin" /> : <ArrowDownToLine size={16} />}{modelReady ? '模型已加载' : '加载配音模型'}</StudioButton><StudioButton className="button secondary" disabled={!modelReady || busy || clearingCache} onClick={() => void unloadModel()}>卸载模型</StudioButton></div><p className="field-hint">卸载只释放运行内存，不会删除缓存和文案。</p></StudioCard>
             <StudioCard className="card settings-card"><div className="card-heading"><div className="section-icon"><ShieldCheck size={20} /></div><div><h2>浏览器兼容性</h2><p>计算在你的设备上完成，性能取决于设备与浏览器。</p></div></div><div className={`compatibility-box ${support?.supported ? 'compatible' : ''}`}>{support?.supported ? <CheckCircle2 size={21} /> : <Info size={21} />}<div><strong>{support ? support.supported ? '当前浏览器可以运行' : '当前环境暂不支持' : '正在检查浏览器能力'}</strong><p>{support?.message || '正在检查本地推理所需的浏览器功能…'}</p></div></div><dl className="details-list compact"><div><dt>WebGPU</dt><dd>{support ? support.webgpu ? '可用' : '不可用' : '检查中'}</dd></div><div><dt>参考音频</dt><dd>{support ? support.supportsReferenceAudio ? '支持上传参考音色' : '当前模型不支持音色克隆' : '检查中'}</dd></div></dl><div className="info-note"><Info size={16} /><p>F5 克隆在浏览器运行，可部署到静态网站。微软预设音色需要本机语音服务和网络，纯静态部署不提供在线合成接口。</p></div></StudioCard>
             <StudioCard className="card settings-card"><div className="card-heading"><div className="section-icon"><HardDrive size={20} /></div><div><h2>存储与缓存</h2><p>模型缓存由浏览器管理，不同浏览器之间不会共用。</p></div></div><dl className="details-list"><div><dt>此站点已用存储</dt><dd>{storage?.usage == null ? '浏览器未提供' : readableBytes(storage.usage)}</dd></div><div><dt>文案草稿</dt><dd>{storageAvailable ? '自动保存在当前浏览器' : '当前浏览器不允许保存'}</dd></div></dl><StudioButton className="button secondary danger-text" disabled={busy || clearingCache} onClick={() => void clearCache()}>{clearingCache ? <LoaderCircle size={15} className="spin" /> : <Trash2 size={15} />}{clearingCache ? '正在删除…' : '删除模型'}</StudioButton><p className="field-hint">清理后需要重新下载模型，不会删除文案草稿。生成的音频请及时下载保存。</p></StudioCard>
