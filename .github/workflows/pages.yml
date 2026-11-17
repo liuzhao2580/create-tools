@@ -19,7 +19,13 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - run: npm ci
+      - name: Install dependencies
+        run: |
+          npm ci > /tmp/npm-ci.log 2>&1 || {
+            cat /tmp/npm-ci.log
+            while IFS= read -r line; do echo "::error::$line"; done < <(tail -30 /tmp/npm-ci.log)
+            exit 1
+          }
       - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
