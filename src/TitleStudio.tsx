@@ -1,7 +1,9 @@
+import TitleCanvasEditor from './TitleCanvasEditor'
 import { useEffect, useRef, useState } from 'react'
-import { Alert, Button, Checkbox, Input, Select, Space, Spin, Tag } from 'antd'
-import { referenceTemplates, type ReferenceTemplate } from './title-reference'
+import { Alert, Button, Input, Select, Space, Spin } from 'antd'
+import { referenceTemplates, extraTextFields, type ReferenceTemplate } from './title-reference'
 import './title-studio.css'
+import './design-workspace.css'
 
 const fontFamilies: Record<string, string> = {
   '思源黑体': 'TitleSans', '思源宋体': 'TitleSong', '站酷庆科黄油体': 'TitleButter',
@@ -35,7 +37,7 @@ const images = new Map<string, Promise<HTMLImageElement>>()
 function loadImage(path: string) {
   if (!images.has(path)) {
     const image = new Image()
-    image.src = `${import.meta.env.BASE_URL}${path}`
+    image.src = path.startsWith('data:image/') ? path : `${import.meta.env.BASE_URL}${path}`
     images.set(path, image.decode().then(() => image).catch(error => { images.delete(path); throw error }))
   }
   return images.get(path)!
@@ -49,7 +51,8 @@ function loadFont(name: string, weight = 400) {
 }
 async function draw(canvas: HTMLCanvasElement, value: ReferenceTemplate, isCurrent = () => true) {
   const image = await loadImage(value.background)
-  await Promise.all(value.layers.map(l => loadFont(l.text === 'title' ? value.font : l.font || '思源黑体', l.weight || 400)))
+  const imageLayers = await Promise.all((value.images || []).map(async layer=>({layer,image:await loadImage(layer.src)})))
+  await Promise.all(value.layers.map(l => loadFont(l.font || (l.text === 'title' ? value.font : '思源黑体'), l.weight || 400)))
   if (value.html) await Promise.all(Object.keys(fontFamilies).map(f => loadFont(f)))
   if (!isCurrent()) return
   const c = canvas.getContext('2d')
@@ -57,9 +60,14 @@ async function draw(canvas: HTMLCanvasElement, value: ReferenceTemplate, isCurre
   canvas.width = 1800
   canvas.height = value.height
   c.drawImage(image, 0, 0, canvas.width, canvas.height)
-  for (const l of value.layers) {
-    const text = l.text === 'title' ? value.title : l.text === 'subtitle' ? value.subtitle : l.text === 'tag' ? value.tag : l.text
-    const family = fontFamilies[l.text === 'title' ? value.font : l.font || '思源黑体'] || 'TitleSans'
+  for (const {layer,image:asset} of imageLayers) {
+    c.save();c.translate(layer.x,layer.y);c.rotate(layer.rotate*Math.PI/180);c.globalAlpha=layer.opacity
+    c.drawImage(asset,-layer.width/2,-layer.height/2,layer.width,layer.height);c.restore()
+  }
+  for (const [index, l] of value.layers.entries()) {
+    if (l.hidden) continue
+    const text = l.text === 'title' ? value.title : l.text === 'subtitle' ? value.subtitle : l.text === 'tag' ? value.tag : value.extraText?.[String(index)] ?? l.text
+    const family = fontFamilies[l.font || (l.text === 'title' ? value.font : '思源黑体')] || 'TitleSans'
     if (l.text === 'title' && value.html) {
       const rows = richLines(text, {text:'',color:l.color,font:family,size:l.size,weight:String(l.weight||400),italic:l.italic?'italic':'normal',stroke:l.stroke||''})
       const font = (r:Run) => `${r.italic} ${r.weight} ${r.size}px "${r.font}", sans-serif`
@@ -104,7 +112,7 @@ async function draw(canvas: HTMLCanvasElement, value: ReferenceTemplate, isCurre
     c.restore()
   }
 }
-function Preview({ value }: { value: ReferenceTemplate }) {
+export function Preview({ value }: { value: ReferenceTemplate }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -124,22 +132,31 @@ function Preview({ value }: { value: ReferenceTemplate }) {
 }
 function readDraft(): ReferenceTemplate {
   try {
+    const selected=templates.find(t=>t.id===sessionStorage.getItem('creator.home.template'))
+    if(selected) return selected
     const v = JSON.parse(localStorage.getItem('creator.title.v2') || 'null')
     const template = templates.find(t => t.id === v?.id)
     if (template && ['title', 'subtitle', 'tag'].every(k => typeof v[k] === 'string')) {
-      return { ...template, title: v.title, subtitle: v.subtitle, tag: v.tag, font: fontFamilies[v.font] ? v.font : template.font, html:v.html===true }
+      const layers = Array.isArray(v.layers) && v.layers.length<=100 && v.layers.every((l:Record<string,unknown>)=>typeof l.text==='string' && typeof l.color==='string' && ['x','y','size','width'].every(k=>typeof l[k]==='number' && Number.isFinite(l[k]))) ? v.layers : template.layers
+      const images = Array.isArray(v.images) ? v.images.filter((l:Record<string,unknown>)=>typeof l.id==='string' && typeof l.name==='string' && typeof l.src==='string' && /^data:image\/(png|jpeg|webp|gif|avif);base64,/.test(l.src) && ['x','y','width','height','rotate','opacity'].every(k=>typeof l[k]==='number' && Number.isFinite(l[k]))).slice(0,30) : []
+      return { ...template, layers, images, background:typeof v.background==='string'&&v.background.startsWith('data:image/')?v.background:template.background, title: v.title, subtitle: v.subtitle, tag: v.tag, font: fontFamilies[v.font] ? v.font : template.font, html:v.html===true, extraText: Object.fromEntries(extraTextFields({...template,layers}).flatMap(f=>typeof v.extraText?.[f.key]==='string'?[[f.key,v.extraText[f.key].slice(0,200)]]:[])) }
     }
   } catch { /* Fall back to the first template when storage is unavailable. */ }
   return templates[0]
 }
-export default function TitleStudio({ initialTitle, onApply }: { initialTitle?: string; onApply?: (image: string) => void } = {}) {
+export async function renderTitleImage(value: ReferenceTemplate) {
+  const canvas = document.createElement('canvas')
+  await draw(canvas, value)
+  return canvas.toDataURL('image/png')
+}
+export default function TitleStudio({ initialTitle, initialTemplate, onApply, onClose }: { onClose?: () => void; initialTitle?: string; initialTemplate?: ReferenceTemplate; onApply?: (image: string, title: string) => void } = {}) {
   const [category, setCategory] = useState('全部模板')
-  const [value, setValue] = useState(readDraft)
+  const [value, setValue] = useState(()=>{const draft=initialTemplate || readDraft();return initialTitle?{...draft,title:initialTitle}:draft})
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
-  useEffect(() => { if (initialTitle) setValue(v => ({ ...v, title: initialTitle })) }, [initialTitle])
+  useEffect(() => { try {sessionStorage.removeItem('creator.home.template')} catch {} }, [])
   useEffect(() => {
-    try { localStorage.setItem('creator.title.v2', JSON.stringify({ id: value.id, title: value.title, subtitle: value.subtitle, tag: value.tag, font: value.font, html:value.html })) }
+    try { localStorage.setItem('creator.title.v2', JSON.stringify({ id: value.id, title: value.title, subtitle: value.subtitle, tag: value.tag, font: value.font, html:value.html, extraText:value.extraText, layers:value.layers, background:value.background, images:value.images })) }
     catch { setMessage('草稿保存失败，请导出图片后再离开。') }
   }, [value])
   async function output(apply: boolean) {
@@ -147,7 +164,7 @@ export default function TitleStudio({ initialTitle, onApply }: { initialTitle?: 
     try {
       const canvas = document.createElement('canvas')
       await draw(canvas, value)
-      if (apply) onApply?.(canvas.toDataURL('image/png'))
+      if (apply) onApply?.(canvas.toDataURL('image/png'), value.html ? new DOMParser().parseFromString(value.title, 'text/html').body.textContent || '' : value.title)
       else {
         const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('导出失败')), 'image/png'))
         const url = URL.createObjectURL(blob)
@@ -160,32 +177,27 @@ export default function TitleStudio({ initialTitle, onApply }: { initialTitle?: 
     finally { setBusy(false) }
   }
   function choose(t: ReferenceTemplate) {
-    setValue({ ...t, title: initialTitle || t.title }); setMessage('')
+    setValue({ ...t }); setMessage('')
   }
+  const [query,setQuery]=useState('')
   const valid = !!value.title.trim()
-  return <div className="title-studio">
-    <div className="title-controls">
-    <aside className="title-categories" aria-label="标题模板分类"><h2>标题样式</h2>
-      {categories.map(c => <Button key={c} type={category === c ? 'primary' : 'default'} aria-pressed={category === c} onClick={() => setCategory(c)}>{c}<span>{c === '全部模板' ? templates.length : templates.filter(t => t.category === c).length}</span></Button>)}
-      <p>每款独立构图<br />主标题、副标题、标签均可修改</p>
-    </aside>
-      <div className="title-gallery">{templates.filter(t => category === '全部模板' || t.category === category).map(t =>
-        <button className="title-template-option" key={t.id} aria-pressed={t.id === value.id} onClick={() => choose(t)}><Preview value={t} /><span>{t.name}</span></button>
-      )}</div>
-        <div className="title-fields"><h2>编辑标题</h2>
-          <Checkbox checked={!!value.html} onChange={e=>setValue({...value,html:e.target.checked})}>HTML 富文本</Checkbox><label>主标题<Input.TextArea rows={3} maxLength={value.html?4000:60} value={value.title} onChange={e => setValue({ ...value, title: value.html?e.target.value:e.target.value.split('\n').slice(0, 3).join('\n') })} /></label>
-          <label>标题字体<Select style={{ width: '100%' }} value={value.font} onChange={font => setValue({ ...value, font })} options={Object.keys(fontFamilies).map(f => ({ label: f, value: f }))} /></label>
-          <label>副标题<Input.TextArea rows={2} maxLength={60} value={value.subtitle} onChange={e => setValue({ ...value, subtitle: e.target.value })} /></label>
-          <label>{value.category === '政务与庆典' ? '右侧标题 / 标签' : '标签文字'}<Input.TextArea rows={2} maxLength={40} value={value.tag} onChange={e => setValue({ ...value, tag: e.target.value })} /></label>
-        </div>
+  return <div className="design-workspace">
+    <header className="design-header">
+      <Button type="text" onClick={onClose}>← 返回排版</Button>
+      <span className="design-document-name">{value.name}</span>
+      <Space><Button onClick={()=>setValue(templates.find(t=>t.id===value.id)!)}>恢复模板</Button>{onApply&&<Button loading={busy} disabled={!valid} onClick={()=>void output(true)}>添加到文章</Button>}<Button type="primary" loading={busy} disabled={!valid} onClick={()=>void output(false)}>导出 PNG</Button></Space>
+    </header>
+    <div className="design-body">
+      <aside className="design-template-sidebar" aria-label="模板">
+        <h2>模板</h2>
+        <Input.Search aria-label="搜索模板" placeholder="搜索标题模板" allowClear value={query} onChange={e=>setQuery(e.target.value)}/>
+        <Select aria-label="模板分类" value={category} onChange={setCategory} options={categories.map(c=>({label:c,value:c}))}/>
+        <div className="design-template-list">{templates.filter(t=>(category==='全部模板'||t.category===category)&&`${t.name} ${t.title}`.includes(query.trim())).map(t=><button className="title-template-option" key={t.id} aria-pressed={t.id===value.id} onClick={()=>choose(t)}><Preview value={t}/><span>{t.name}</span></button>)}</div>
+      </aside>
+      <main className="design-canvas-area">
+        <TitleCanvasEditor key={value.id} value={value} onChange={setValue} fonts={fontFamilies}><Preview value={value}/></TitleCanvasEditor>
+        {message&&<Alert className="design-feedback" title={message} type={message.includes('失败')?'error':'info'} closable={{onClose:()=>setMessage('')}}/>}
+      </main>
     </div>
-    <section className="title-live-preview" aria-label="实时预览">
-        <div className="title-preview"><Space wrap><h2>{value.name}</h2><Tag>{value.category}</Tag></Space><Preview value={value} /><p>1800 × {value.height} · 主标题根据长度自动适配</p><Button size="small" onClick={() => setValue(templates.find(t => t.id === value.id)!)}>查看模板原始文案</Button></div>
-      <div className="title-output-actions">
-          {onApply && <Button block type="primary" loading={busy} disabled={!valid} onClick={() => void output(true)}>添加到文章</Button>}
-          <Button block loading={busy} disabled={!valid} onClick={() => void output(false)}>导出 PNG 标题图</Button>
-          {message && <Alert title={message} type={message.includes('失败') ? 'error' : 'info'} showIcon />}
-      </div>
-    </section>
   </div>
 }
