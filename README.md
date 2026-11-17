@@ -127,3 +127,17 @@ Python 需有 `mlx-audio`、`mlx`、`numpy`、`soundfile`，系统需有 `ffmpeg
 - `edgeSpeechPlugin` 和 `subtitleSpeechPlugin` 是项目自带的本机 API 插件，不是 Vite 官方内置插件。移除后，微软配音和字幕配音的本机接口不可用。
 - 两份 TypeScript 配置保留现有 ES2022、strict 和 bundler 模块解析策略，不为照抄模板改变运行目标。
 - `*.tsbuildinfo` 是自动生成的增量检查缓存，不是需要编辑的配置；现统一放入 `node_modules/.tmp`，已被 Git 忽略。
+
+### 从开发分支发布 GitHub Pages
+
+在 `dev-lll` 分支提交完代码后执行：
+
+```bash
+npm run deploy:pages
+```
+
+命令会检查工作区、获取远端分支、推送 `dev-lll`，在临时 Git worktree 中合并到最新 `origin/dev-pages`，然后推送发布分支触发 Actions。当前工作目录仍停留在 `dev-lll`，保留 `dev-pages` 专用部署配置。无需手动切换分支。
+
+未提交的改动、开发分支落后、合并冲突或推送被拒绝都会停止发布，不会强制覆盖远端。若合并失败，开发分支可能已经推送成功，发布分支不会更新。重复运行但无新提交时不会触发新的部署。
+
+首次使用仍需在 GitHub Settings → Pages 选择 GitHub Actions，并在 github-pages 环境中允许 dev-pages 分支部署。命令成功表示推送成功，线上部署结果请到仓库 Actions 查看。
