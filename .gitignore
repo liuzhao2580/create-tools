@@ -1,8 +1,11 @@
 node_modules/
 dist/
+# 本机环境配置不进入仓库，仅保留配置示例。
 .env
 .env.*
 !.env.example
+
+# 本机浏览器数据、模型、虚拟环境及临时产物。
 .local/
 server/.venv/
 __pycache__/

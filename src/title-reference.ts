@@ -1,12 +1,13 @@
 /** Coordinates are normalized to 1800px wide. Each reference owns its typography layout. */
-export type TitleLayer = { text: 'title' | 'subtitle' | 'tag' | string; x: number; y: number; width: number; size: number; color: string; font?: string; weight?: number; align?: CanvasTextAlign; rotate?: number; italic?: boolean; stroke?: string; lineHeight?: number; lineColors?: string[]; highlights?: [string, string][] }
-export type ReferenceTemplate = { id: string; category: string; name: string; style: string; color: string; title: string; subtitle: string; tag: string; font: string; background: string; height: number; layers: TitleLayer[]; html?: boolean }
+export type TitleLayer = { text: 'title' | 'subtitle' | 'tag' | string; x: number; y: number; width: number; size: number; color: string; font?: string; weight?: number; align?: CanvasTextAlign; rotate?: number; italic?: boolean; hidden?: boolean; stroke?: string; lineHeight?: number; lineColors?: string[]; highlights?: [string, string][] }
+export type ImageLayer = { id: string; name: string; src: string; x: number; y: number; width: number; height: number; rotate: number; opacity: number }
+export type ReferenceTemplate = { id: string; category: string; name: string; style: string; color: string; title: string; subtitle: string; tag: string; font: string; background: string; height: number; layers: TitleLayer[]; html?: boolean; extraText?: Record<string, string>; images?: ImageLayer[] }
 const layer=(text:string,x:number,y:number,width:number,size:number,color:string,extra:Partial<TitleLayer>={}):TitleLayer=>({text,x,y,width,size,color,...extra})
 const main=(x:number,y:number,width:number,size:number,color:string,extra:Partial<TitleLayer>={})=>layer('title',x,y,width,size,color,extra)
 const sub=(x:number,y:number,width:number,size:number,color:string,extra:Partial<TitleLayer>={})=>layer('subtitle',x,y,width,size,color,extra)
 const tag=(x:number,y:number,width:number,size:number,color:string,extra:Partial<TitleLayer>={})=>layer('tag',x,y,width,size,color,extra)
 function make(group:string,n:number,name:string,title:string,subtitle:string,tagText:string,font:string,layers:TitleLayer[]):ReferenceTemplate {
- return {id:`${group}-${n}`,category:group==='life'?'生活与活动':group==='news'?'资讯与科普':'政务与庆典',name,title,subtitle,tag:tagText,font,layers,style:'reference',color:layers[0].color,background:`title-templates/reference/${group}-${String(n).padStart(2,'0')}.png`,height:group==='red'?540:766}
+ return {id:`${group}-${n}`,category:group==='life'?'生活与活动':group==='news'?'资讯与科普':'政务与庆典',name,title,subtitle,tag:tagText,font,layers,style:'reference',color:layers[0].color,background:`title-templates/${group==='life'&&n===2?'full-bleed':'hd'}/${group}-${String(n).padStart(2,'0')}.webp`,height:group==='red'?540:766}
 }
 export const referenceTemplates:ReferenceTemplate[]=[
  make('life',1,'夏日美食市集','夏日美食市集','尝遍人间烟火气','好吃 / 好玩 / 好生活','思源黑体',[
@@ -70,3 +71,15 @@ export const referenceTemplates:ReferenceTemplate[]=[
  make('red',10,'政策新动态 · 发布会','政策新动态','20XX最新企业政策发布','最新\n政策','思源黑体',[
  main(650,223,1130,175,'#ffe6b2',{weight:800,italic:true}),sub(650,385,1020,65,'#ffe2ac',{font:'思源宋体',italic:true}),tag(1535,250,450,175,'#ffe6b2',{weight:800})]),
 ]
+
+/** Literal copy is editable too: dates, locations, years and decorative captions. */
+export function extraTextFields(template: ReferenceTemplate) {
+ return template.layers.flatMap((layer, index) => {
+  if (['title', 'subtitle', 'tag'].includes(layer.text)) return []
+  const text = layer.text
+  const label = text.startsWith('时间') ? '活动时间' : text.startsWith('地点') ? '活动地点'
+   : /1949|20XX/.test(text) ? '年份' : /\d+[./]\d+/.test(text) ? '日期'
+   : text.includes('大学') ? '学校 / 社团' : '附加文字'
+  return [{ key: String(index), label, defaultValue: text }]
+ })
+}

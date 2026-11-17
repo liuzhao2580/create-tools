@@ -13,7 +13,7 @@ export interface ToolDefinition {
 // Add future tools here, then register their view in App.tsx.
 export const toolRegistry: ToolDefinition[] = [
   { id: 'article', group: '公众号', route: '/article', name: '公众号排版', description: '编辑文章并复制公众号排版', icon: LayoutTemplate },
-  { id: 'cover', group: '图片创作', route: '/cover', name: '封面编辑', description: '调整副标题并导出封面', icon: Image },
+  { id: 'cover', group: '图片创作', route: '/board', name: '自由画板', description: '从空白画布编辑文字与图片', icon: Image },
   { id: 'subtitles', group: '音频创作', route: '/subtitles', name: '字幕配音', description: '上传字幕，配音对齐画面', icon: Captions },
   { id: 'voice', group: '音频创作', route: '/voice', name: '文案配音', description: '把文案变成自然的声音', icon: AudioLines },
 ]
