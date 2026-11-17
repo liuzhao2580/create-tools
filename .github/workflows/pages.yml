@@ -23,7 +23,7 @@ jobs:
         run: |
           npm ci > /tmp/npm-ci.log 2>&1 || {
             cat /tmp/npm-ci.log
-            while IFS= read -r line; do echo "::error::$line"; done < <(tail -30 /tmp/npm-ci.log)
+            while IFS= read -r line; do echo "::error::$line"; done < <(head -10 /tmp/npm-ci.log)
             exit 1
           }
       - run: npm test
