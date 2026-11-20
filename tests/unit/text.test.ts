@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { validateText, readTextFile, textStats, formatDuration } from '../../src/text'
+import { validateText, readTextFile, textStats, formatDuration } from '../../src/shared/utils/text'
 
 describe('文案输入边界', () => {
   it('阻止空白、超长文案以及未断句的长句', () => {

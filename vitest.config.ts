@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'node',
     include: [
       'tests/unit/**/*.test.ts',
-      'src/engine/*.test.ts',
+      'src/shared/audio/engine/*.test.ts',
     ],
     exclude: [...configDefaults.exclude, '**/._*'],
   },

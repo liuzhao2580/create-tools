@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { OperationProgress } from '../../src/App'
-import { F5BrowserEngine } from '../../src/engine/f5-engine'
+import { OperationProgress } from '../../src/shared/components/OperationProgress'
+import { F5BrowserEngine } from '../../src/shared/audio/engine/f5-engine'
 
 afterEach(() => vi.unstubAllGlobals())
 describe('模型进度与删除', () => {

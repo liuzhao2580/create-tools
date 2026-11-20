@@ -10,7 +10,7 @@ async def main():
         print('ready')
         return
     payload = json.load(sys.stdin)
-    voices = json.loads((Path(__file__).parent.parent / 'src/voices.json').read_text())
+    voices = json.loads((Path(__file__).parent.parent / 'src/shared/audio/voices.json').read_text())
     if payload.get('voice') not in {v['id'] for v in voices}:
         raise ValueError('不支持的音色')
     text = payload.get('text')

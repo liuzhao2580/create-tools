@@ -45,7 +45,7 @@ F5 配音计算在浏览器 Worker 内进行；微软音色需要保留本机语
 
 ## 当前两条研究路线
 
-- `src/engine/f5-*`：F5-TTS 浏览器参考音色实验，中文使用音节级拼音输入；首次模型下载约 792 MB，需要 WebGPU 与 FP16。当前网页入口接入该研究适配器，尚不代表音色验收通过。
+- `src/shared/audio/engine/f5-*`：F5-TTS 浏览器参考音色实验，中文使用音节级拼音输入；首次模型下载约 792 MB，需要 WebGPU 与 FP16。当前网页入口接入该研究适配器，尚不代表音色验收通过。
 - `public/runtime/qwen/`：固定的 Qwen3-TTS 浏览器运行时资产；真实设备测试脚本位于本地忽略目录 `.local/`，尚未作为网页默认引擎。Qwen 运行时需 Memory64 和跨源隔离，模型另下载约 1.48 GB。现有浏览器接口只有参考音频，不等价于原 MLX 的参考音频加原文条件。
 
 模型由浏览器从 Hugging Face 下载并缓存，文案及参考录音不发送到推理服务。换电脑需要重新下载模型、重新选择参考录音；草稿和结果不会自动跨设备同步。浏览器可能回收缓存，音频生成后请下载保存。
@@ -66,7 +66,7 @@ Qwen 实验的同源 service worker 用于静态站点跨源隔离；首访可�
 
 1. 在 `src/tools.ts` 注册工具的 id、路由、名称及图标。
 2. 新工具放在独立模块，在 `src/App.tsx` 接入对应页面。
-3. 推理引擎与 UI 通过 `src/engine-types.ts` 分离；新模型实现 `BrowserVoiceEngine`，保留真实进度、取消与错误反馈。
+3. 推理引擎与 UI 通过 `src/shared/audio/engine-types.ts` 分离；新模型实现 `BrowserVoiceEngine`，保留真实进度、取消与错误反馈。
 4. 为核心逻辑添加测试；禁止用模拟音频充当实际生成结果。
 
 ## 来源和许可
@@ -105,7 +105,7 @@ Python 需有 `mlx-audio`、`mlx`、`numpy`、`soundfile`，系统需有 `ffmpeg
 
 
 ## 标题模板（2026-11-07）
-导航入口：#/titles。独立分类侧栏：二十四节气、正常文章标题、医疗饮食科普、心理与生活。首批8种模板，支持编辑主标题（最多3行）、副标题、标签，草稿保存在当前浏览器，导出1800×766 PNG。节气选择提供24个名称，不自动填写公历与农历日期。霜降用原创水墨背景，其他节气使用四季留白版；橙色手绘模板保留用户确认样例。模板定义与渲染位于src/TitleStudio.tsx，素材位于public/title-templates。用户参考截图归档于.local/title-template-references。
+导航入口：#/titles。独立分类侧栏：二十四节气、正常文章标题、医疗饮食科普、心理与生活。首批8种模板，支持编辑主标题（最多3行）、副标题、标签，草稿保存在当前浏览器，导出1800×766 PNG。节气选择提供24个名称，不自动填写公历与农历日期。霜降用原创水墨背景，其他节气使用四季留白版；橙色手绘模板保留用户确认样例。模板定义与渲染位于src/shared/title-editor/TitleStudio.tsx，素材位于public/title-templates。用户参考截图归档于.local/title-template-references。
 
 ## 配置文件怎么改
 
@@ -141,3 +141,46 @@ npm run deploy:pages
 未提交的改动、开发分支落后、合并冲突或推送被拒绝都会停止发布，不会强制覆盖远端。若合并失败，开发分支可能已经推送成功，发布分支不会更新。重复运行但无新提交时不会触发新的部署。
 
 首次使用仍需在 GitHub Settings → Pages 选择 GitHub Actions，并在 github-pages 环境中允许 dev-pages 分支部署。命令成功表示推送成功，线上部署结果请到仓库 Actions 查看。
+
+
+## 本地人声分离
+
+在首页或左侧导航打开「人声分离」（`#/separation`）。该功能需要本地 Vite 服务，静态部署不可执行分离。
+
+```sh
+npm run setup:separation
+npm run dev
+```
+
+依赖 Python 3.10+（本次使用 3.13）和 PATH 中的 FFmpeg。安装会创建独立的 `.local/separation-venv`，不修改配音环境。一键安装会下载两个分离模型及配置，并逐个实际加载验证，全部成功后才标记就绪；处理时只读取 `.local/separation-models`，缺失或损坏会提示重新安装，不在处理期间下载；媒体不上传第三方服务。引擎使用 [Audio Separator](https://github.com/nomadkaraoke/python-audio-separator)，所选模型分别来自其公开模型目录，模型权重遵循各自上游许可。
+
+- 选择本机视频/音频（最大 4 GB），填写起点和处理时长（5–600 秒）。建议先比较同一段 30 秒对白。
+- 提供 MelBand RoFormer / BS-RoFormer 两种模型，输出原声、人声、背景音 WAV。背景音包含音效与音乐，不是纯音效。
+- 再次选择另一模型处理同一区间；点击「切换试听」可从正在播放的位置切到另一个音轨。任务列表保留本标签页最近 10 次记录。
+- 用人声 WAV 替代剪辑软件中的原声，再加入新 BGM。本版本不自动重混或导出视频，不承诺无损对白或去净配乐。
+- 同时仅运行一个任务，可停止；最长运行 2 小时。上传副本在任务结束后删除，WAV、日志和状态保留。
+- 默认输出：`/Volumes/liu/MoviesClips/音频分离/<任务 ID>/`。可在启动前通过 `SEPARATION_OUTPUT_DIR` 更改；`SEPARATION_PYTHON` 可指定现有推理环境。
+- 本机服务重启后，任务链接失效；已输出文件仍可从上述目录使用。处理失败时展开日志定位网络下载、依赖或内存问题。
+
+原始素材不会被覆盖。两个模型均来自音乐分离领域，影视对白应以实测试听为准；更换界面不等于提高模型质量。
+
+
+## 前端目录约定
+
+每个路由的页面组件、专用子组件、样式和业务逻辑放在同一目录，不再平铺到 src 根目录。
+
+- `src/pages/home/`：首页
+- `src/pages/article/`：公众号排版及模板选择
+- `src/pages/cover/`：封面编辑
+- `src/pages/board/`：自由画板、吸附及模板转换
+- `src/pages/subtitles/`：字幕配音及字幕解析
+- `src/pages/separation/`：人声分离
+- `src/pages/voice/`：文案配音界面和状态逻辑
+- `src/pages/settings/`：模型与设置界面，复用配音状态以保留路由切换时的任务
+- `src/shared/`：跨页面复用的组件、音频引擎、标题编辑器和工具函数
+- `src/styles/`：全局基础样式、字体和主题
+- `src/router/`：导航工具注册
+
+`App.tsx` 负责应用外壳与页面切换，`main.tsx` 负责启动和全局配置。新增页面时先建立对应路由目录；只有跨页面复用的模块才进入 shared。
+
+人声分离安装位置：默认模型目录为项目 `.local/separation-models`，Python 环境为 `.local/separation-venv`。页面始终显示实际路径；通过“选择模型目录”可指定安装位置或使用已有目录，选择保存在 `.local/separation-config.json`，命令行安装也复用此配置。切换目录不会搬移或删除旧文件。安装进度与日志保存在 `.local/separation-install.json` 和 `.local/separation-install.log`；安装进程独立于开发服务器，刷新页面或重启开发服务器会重新连接已有进度。电脑关闭导致的中断会显示为未完成，完整下载的模型可复用。

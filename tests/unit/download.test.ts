@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { downloadRanges } from '../../src/engine/download'
+import { downloadRanges } from '../../src/shared/audio/engine/download'
 afterEach(() => vi.unstubAllGlobals())
 describe('模型分段下载', () => {
   it('按范围拼接，完成块可从缓存恢复而不重新请求', async () => {

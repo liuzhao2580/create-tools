@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseSrt, timecode } from '../../src/subtitles'
+import { parseSrt, timecode } from '../../src/pages/subtitles/subtitles'
 const line = (start = '00:00:05,000', end = '00:00:08,500', text = '第一句。') => `1\n${start} --> ${end}\n${text}`
 describe('SRT timing', () => {
   it('preserves leading silence, gaps, BOM, CRLF and multiline text', () => {

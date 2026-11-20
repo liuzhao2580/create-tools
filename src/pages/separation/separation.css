@@ -1,0 +1,86 @@
+.separation-workspace { --sep-line: var(--border); --sep-muted: var(--muted); display: grid; gap: 20px; }
+.separation-intro { display: flex; align-items: center; gap: 16px; padding: 4px 0 20px; border-bottom: 1px solid var(--sep-line); }
+.separation-intro strong { font-size: 18px; }
+.separation-intro p,.separation-job p { margin: 7px 0; color: var(--sep-muted); line-height: 1.7; }
+.separation-layout { display: grid; grid-template-columns: minmax(260px, 330px) minmax(0, 1fr); gap: 36px; }
+.separation-controls { display: flex; flex-direction: column; gap: 16px; }
+.separation-workspace h2 { font-size: 13px; color: var(--sep-muted); margin: 0 0 8px; display: flex; gap: 12px; align-items: center; }
+.separation-workspace h2 span { font-size: 18px; color: var(--ink); }
+.separation-controls .ant-upload-drag p { font-size: 15px; overflow-wrap: anywhere; padding: 0 8px; }
+.separation-controls .ant-upload-drag small { color: var(--sep-muted); }
+.separation-times { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.separation-times label,.separation-model { display: grid; gap: 8px; font-size: 14px; }
+.separation-times .ant-input-number { width: 100%; }
+.separation-hint { font-size: 13px; color: var(--sep-muted); line-height: 1.75; margin: 0; }
+.separation-source { font-size: 13px; text-align: center; }
+.separation-results { min-width: 0; border-left: 1px solid var(--sep-line); padding-left: 32px; }
+.separation-results > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.separation-results > header > span { color: var(--sep-muted); font-size: 12px; }
+.separation-results .ant-empty { margin: 90px 0; }
+.separation-job { border-bottom: 1px solid var(--sep-line); padding: 22px 0; }
+.separation-job-title { display: flex; justify-content: space-between; gap: 12px; }
+.separation-job-title h3 { font-size: 17px; margin: 0; }
+.separation-job-title small { display: block; color: var(--sep-muted); font-size: 12px; font-weight: 400; margin-top: 6px; }
+.separation-job-title p { overflow-wrap: anywhere; font-size: 13px; }
+.separation-job-title > span { white-space: nowrap; font-size: 12px; color: var(--sep-muted); }
+.separation-track { margin: 20px 0; }
+.separation-track > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+.separation-track > div > div { display: flex; align-items: center; gap: 14px; }
+.separation-track strong { font-size: 14px; }
+.separation-track a { display: flex; align-items: center; gap: 5px; font-size: 13px; }
+.separation-track audio { display: block; width: 100%; height: 42px; }
+.separation-path { font-size: 12px; overflow-wrap: anywhere; }
+.separation-job details { font-size: 12px; margin-top: 14px; }
+.separation-job summary { cursor: pointer; padding: 8px 0; }
+.separation-job pre { max-height: 180px; overflow: auto; background: var(--soft); padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tool-art-separation .tool-wave { opacity: .85; }
+
+
+.separation-times { grid-template-columns: minmax(0, 1fr); }
+.separation-times .ant-segmented { width: 100%; }
+.separation-times .ant-segmented-group { display: flex; }
+.separation-times .ant-segmented-item { flex: 1; text-align: center; }
+.separation-destination { margin: 16px 0; }
+.separation-destination .separation-path { overflow-wrap: anywhere; }
+
+.separation-intro .separation-help-button{margin-left:auto;flex-shrink:0;width:44px;height:44px}
+.separation-help-button:focus-visible{outline:2px solid var(--ant-color-primary,#0077b6);outline-offset:2px}
+
+/* Desktop workspace: fixed viewport, compact controls and one result at a time. */
+.separation-shell{height:100dvh;overflow:hidden}
+.separation-shell>.workspace{height:100%;display:flex;flex-direction:column}
+.separation-shell .topbar{flex:none;height:52px}
+.separation-shell main{flex:1;min-height:0;display:flex;flex-direction:column;padding:16px 28px;overflow:hidden}
+.separation-shell .page-heading{margin-bottom:10px;flex:none}
+.separation-shell .page-heading h1{font-size:28px;margin:0}
+.separation-shell .page-heading p{margin:4px 0 0}
+.separation-shell .page-footer{display:none}
+.separation-shell .separation-workspace{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+.separation-shell .separation-intro{flex:none;padding:0 0 10px;gap:12px}
+.separation-shell .separation-intro p{margin:2px 0;font-size:14px}
+.separation-shell .separation-layout{flex:1;min-height:0;gap:24px;grid-template-columns:minmax(340px,0.45fr) minmax(0,0.55fr)}
+.separation-shell .separation-controls{gap:10px;min-height:0}
+.separation-shell .separation-workspace h2{margin:0 0 4px}
+.separation-shell .separation-controls .ant-upload-drag .ant-upload{padding:10px}
+.separation-shell .separation-controls .ant-upload-drag p{margin:4px 0}
+.separation-shell .separation-controls .ant-upload-drag svg{width:24px;height:24px}
+.separation-shell .separation-times{grid-template-columns:110px minmax(0,1fr);gap:10px}
+.separation-shell .separation-times .ant-segmented-item-label{padding:0 8px}
+.separation-shell .separation-times label,.separation-shell .separation-model{gap:5px}
+.separation-shell .separation-controls .separation-destination{margin:0}
+.separation-shell .separation-path{margin:4px 0;font-size:13px;line-height:1.5}
+.separation-shell .separation-results{min-height:0;overflow:auto;scrollbar-width:none;padding-left:24px}
+.separation-shell .separation-results::-webkit-scrollbar{display:none}
+.separation-shell .separation-job{padding:14px 0;border:0}
+.separation-shell .separation-track{margin:12px 0}
+.separation-shell .separation-job p{margin:4px 0;line-height:1.5}
+.separation-shell .separation-workspace>.ant-alert{max-height:160px;overflow:auto;flex:none}
+.separation-log{max-height:65vh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+
+.separation-shell .separation-environment-status{height:24px;padding:0;align-self:flex-start;flex:none}
+.separation-shell .separation-controls>.ant-btn{flex-shrink:0}
+
+.separation-log{user-select:text;cursor:text}
+
+.separation-results>header h2{flex-shrink:0;white-space:nowrap}
+.separation-results>header .ant-select{min-width:0;max-width:260px;flex:1}

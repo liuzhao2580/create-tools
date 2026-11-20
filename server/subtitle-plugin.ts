@@ -5,9 +5,9 @@ import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Plugin } from 'vite'
-import { parseSrt, type SubtitleJob } from '../src/subtitles.ts'
+import { parseSrt, type SubtitleJob } from '../src/pages/subtitles/subtitles.ts'
 
-const root = fileURLToPath(new URL('../.local/subtitle-jobs/', import.meta.url))
+const root = fileURLToPath(new URL('../.local/subtitle-jobs', import.meta.url))
 const configPath = fileURLToPath(new URL('../.local/subtitle-voice.json', import.meta.url))
 const script = fileURLToPath(new URL('./subtitle_voice.py', import.meta.url))
 export function subtitleSpeechPlugin(): Plugin {

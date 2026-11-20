@@ -1,0 +1,20 @@
+.site-settings > main{max-width:1200px;margin:0 auto;padding:48px 40px 64px;width:100%}
+.site-settings-heading{margin-bottom:32px}
+.site-settings-heading>a{font-size:13px;color:#81798e}
+.site-settings-heading h1{font-size:36px;letter-spacing:-1px;margin:12px 0;color:#262338}
+.site-settings-heading p{font-size:15px;color:#7a7586;margin:0}
+.site-header [aria-current="page"]{color:#6943d1;font-weight:600}
+.site-settings .settings-layout{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.site-settings .settings-card{padding:0;border-color:#e9e5ee;border-radius:14px}
+.site-settings .settings-card .ant-card-body{padding:24px}
+.site-settings .card-heading{gap:12px;margin-bottom:18px;padding-bottom:18px}
+.site-settings .card-heading h2{font-size:17px}
+.site-settings .card-heading p{font-weight:400;font-size:13px}
+.site-settings .section-icon{background:#f1ecfb;color:#6943d1}
+.site-settings .details-list>div{font-size:14px;padding-block:13px;gap:18px}
+.site-settings .details-list dd{text-align:right;min-width:0}
+.site-settings .compatibility-box{padding:16px;margin-bottom:12px;font-size:14px}
+.site-settings .field-hint,.site-settings .info-note{font-size:13px;line-height:1.8}
+.site-settings .settings-actions{margin-top:20px}
+.site-settings .button.primary{background:#6943d1;border-color:#6943d1}
+.site-settings .settings-card:last-child{grid-column:1/-1}

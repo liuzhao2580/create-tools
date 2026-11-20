@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { generatePresetVoice, voices } from '../../src/edge-voice'
+import { generatePresetVoice, voices } from '../../src/shared/audio/edge-voice'
 const options = () => ({ text: '第一段。\n\n第二段。', tempo: .88, pauseSeconds: .6, signal: new AbortController().signal, onProgress: vi.fn() })
 afterEach(() => vi.unstubAllGlobals())
 function browser() {

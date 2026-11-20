@@ -3,7 +3,7 @@ import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Plugin } from 'vite'
-import voices from '../src/voices.json' with { type: 'json' }
+import voices from '../src/shared/audio/voices.json' with { type: 'json' }
 const script = fileURLToPath(new URL('./edge_bridge.py', import.meta.url))
 const localPython = fileURLToPath(new URL('../.local/edge-venv/bin/python', import.meta.url))
 const python = process.env.EDGE_TTS_PYTHON || (existsSync(localPython) ? localPython : 'python3')
