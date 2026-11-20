@@ -1,0 +1,40 @@
+{
+  "version": "0.3",
+  "styleApproval": "User approved original 16 + batch-001 36 glyphs in this conversation on 2026-11-18. Later batches follow that style; no separate user approval claimed.",
+  "approvedCharacters": "第集上中下一二三四五六七八九十零人物故事信仰选择命运真相潜伏余则成心生活时光世界爱恨情义家国风雨山河梦想",
+  "batches": [
+    {
+      "id": "002",
+      "image": "batch-002.png",
+      "rows": 6,
+      "columns": 6,
+      "characters": "的了是在不有和我你他她们这那就都也很与为能会要说看听来去到过把被让从对自",
+      "review": "assistant visually checked source sheet; not separately user-approved"
+    },
+    {
+      "id": "003",
+      "image": "batch-003.png",
+      "rows": 6,
+      "columns": 6,
+      "characters": "知道得出里外前后天地日夜春夏秋冬东南西北年月分秒百千万无最好多少开始结束",
+      "review": "assistant visually checked source sheet; not separately user-approved"
+    },
+    {
+      "id": "004",
+      "image": "batch-004.png",
+      "rows": 6,
+      "columns": 6,
+      "characters": "文字创作者工具视频图片声音电影封面标题剧解读深析执念守护英雄战争平静勇气",
+      "review": "assistant visually checked source sheet; not separately user-approved"
+    },
+    {
+      "id": "005",
+      "image": "batch-005.png",
+      "rows": 6,
+      "columns": 6,
+      "characters": "定制毛笔体常用汉名新闻记录美丽快乐幸福重逢离别回忆等待走进远方路长大小学",
+      "review": "assistant visually checked source sheet; not separately user-approved"
+    }
+  ],
+  "target": "GB2312 汉字 6763 字，分批定制；未完成"
+}

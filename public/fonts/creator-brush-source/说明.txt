@@ -1,4 +1,14 @@
-Creator Brush v1
-定制字形：第集上中下一二三四五六七八九十零
-其余字符沿用 Ma Shan Zheng（OFL），并非全部字都已定制。使用内置图像生成制作16字母稿，再转换轮廓；不是从原封面恢复的完整原字体。白色和阴影通过编辑器设置。
-母稿提示：4×4等距格，按第集上中/下一二三/四五六七/八九十零排列，参考第十四集题字的粗笔飞白书法，纯黑字白底，无阴影，字形独立。
+历史 v1 混合字库说明（仅用于溯源，已不作为编辑器的定制笔触入口）
+当前定制字库为 CreatorBrush-Custom.ttf，具体范围见 expansion/coverage-report.json。
+
+Creator Brush v1 — 字库覆盖说明
+
+包含 GB2312 全部 6763 个汉字（一级 3755 字、二级 3008 字），常用简体中文可直接输入，无需另行导入字体。
+定制字形：第集上中下一二三四五六七八九十零（16 字）。
+其余字符使用 Ma Shan Zheng（马善政楷书，SIL OFL 许可）毛笔字形，并非全部汉字均已独立定制，笔触可能不同。
+不宣称覆盖全部繁体字、异体字或生僻字。
+
+构建：python3 public/fonts/creator-brush-source/build_font.py
+检查：python3 public/fonts/creator-brush-source/check_coverage.py
+母稿 glyph-master.png 为 4×4 网格，按第集上中/下一二三/四五六七/八九十零排列。
+白色、描边和阴影由编辑器设置。
