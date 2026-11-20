@@ -1,0 +1,4 @@
+audio-separator[cpu]==0.48.0
+
+# Imported by audio-separator spec_utils but missing from its dependency metadata.
+audioread>=3.0,<4

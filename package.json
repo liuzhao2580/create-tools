@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "deploy:pages": "node scripts/deploy-pages.mjs"
+    "deploy:pages": "node scripts/deploy-pages.mjs",
+    "setup:separation": "node scripts/setup-separation.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.4",
