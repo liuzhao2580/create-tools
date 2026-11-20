@@ -1,0 +1,17 @@
+/* Shared public navigation with task-specific editing areas. */
+.tool-site{min-width:1000px;min-height:100dvh;background:#fff;color:#262338;font-family:StudioPingFang,sans-serif;display:flex;flex-direction:column}
+.tool-site>.site-header{flex:none;position:sticky;top:0;z-index:30;height:72px}
+.tool-site .site-header .site-primary{display:inline-flex;align-items:center;gap:14px;background:#6943d1;color:#fff;padding:12px 22px;border-radius:8px;font-size:14px;font-weight:600}
+.tool-site>.workspace{margin:0;width:100%;min-width:0;flex:1;height:auto}
+.tool-site>.workspace>main{width:100%;max-width:1600px;margin:0 auto;padding:24px 40px 32px}
+.tool-page-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:22px;flex:none}
+.tool-site .tool-page-heading h1{font-family:StudioPingFang,sans-serif;font-size:26px;font-weight:650;margin:0;line-height:1.4;color:#292336}
+.tool-page-heading p{font-size:14px;color:#81798b;margin:6px 0 0}
+.tool-page-heading>a{display:inline-flex;align-items:center;gap:8px;color:#6943d1;font-size:13px;white-space:nowrap}
+.tool-site.cover-shell>.workspace,.tool-site.separation-shell>.workspace{min-height:0;overflow:hidden}
+.tool-site.cover-shell>.workspace>main,.tool-site.separation-shell>.workspace>main{min-height:0;flex:1;display:flex;flex-direction:column;padding-top:18px;padding-bottom:16px}
+.tool-site.cover-shell .tool-page-heading,.tool-site.separation-shell .tool-page-heading{margin-bottom:16px}
+.tool-site .cover-empty h2{font-family:StudioPingFang,sans-serif;font-size:20px}
+.tool-site .subtitle-studio{max-width:none}
+.tool-site.board-site{height:100dvh;overflow:hidden}
+.board-site>.blank-board{height:auto;flex:1;min-height:0}

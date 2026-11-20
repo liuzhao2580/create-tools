@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest'
-import {findSnaps} from '../../src/board-snapping'
+import {findSnaps} from '../../src/pages/board/board-snapping'
 describe('board alignment snapping',()=>{
  it('snaps the center with a zoom-independent screen tolerance',()=>{
   const t={left:456,top:200,width:100,height:100}

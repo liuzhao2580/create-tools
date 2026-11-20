@@ -1,0 +1,26 @@
+
+.canvas-tool-actions{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 10px}
+.canvas-background-upload{display:inline-flex;align-items:center;position:relative;background:white;border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px}
+.canvas-background-upload input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.canvas-layer-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:white;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px}
+.canvas-layer-toolbar>.ant-select{width:180px}.canvas-layer-toolbar>.ant-input{width:220px}
+.canvas-layer-toolbar label{display:flex;align-items:center;gap:6px;font-size:14px}
+.canvas-layer-toolbar .ant-input-number{width:76px}
+.canvas-layer-toolbar .ant-btn[aria-pressed=true]{color:var(--accent);background:var(--accent-soft);border-color:var(--accent)}
+.editable-title-stage{position:relative}
+.title-three-columns .editable-title-stage .title-canvas-wrap{margin-top:0;max-width:none}
+.title-hit-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.title-layer-handle{position:absolute;pointer-events:auto;background:transparent!important;border:1px solid transparent;border-radius:0;padding:0;cursor:move;touch-action:none;min-height:8px;min-width:8px}
+.title-layer-handle:hover{border-color:#94cbe6}.title-layer-handle.selected,.title-layer-handle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.canvas-edit-hint{font-size:14px;color:var(--muted);line-height:1.7;margin:12px 0 0}
+.title-three-columns{grid-template-columns:minmax(260px,.85fr) minmax(240px,.65fr) minmax(0,1.6fr);align-items:start}
+.title-three-columns>.title-controls,.title-three-columns>.title-fields{height:100%}
+.title-three-columns>.title-live-preview{height:auto;max-height:100%;align-self:start;background:#f9fbfc}
+.title-three-columns .title-live-preview .title-preview>p{margin:8px 0}
+
+
+
+.title-image-hit-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.title-image-handle{position:absolute;pointer-events:auto;border:1px solid transparent;background:transparent!important;border-radius:0;cursor:move;touch-action:none;padding:0}
+.title-image-handle:hover{border-color:#94cbe6}
+.title-image-handle.selected,.title-image-handle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
