@@ -5,7 +5,7 @@ import './cover.css'
 import { creatorBrushFamily,creatorBrushCount,creatorBrushCharacters,missingCreatorBrushCharacters } from '../../shared/fonts/creator-brush'
 
 type Draft = { image: string; text: string; font: string; fontData?: string; size: number; x: number; y: number; color: string; outline: string; stroke: number }
-const initial: Draft = { image: '', text: '在这里输入副标题', font: 'StudioPingFang', size: 70, x: 50, y: 92, color: '#111111', outline: '#ffffff', stroke: 4 }
+const initial: Draft = { image: '', text: '在这里输入副标题', font: 'StudioPingFang', size: 70, x: 50, y: 92, color: '#111111', outline: '#ffffff', stroke: 1 }
 const artFonts = [{ value: 'Creator Brush', label: `定制毛笔体 · ${creatorBrushCount} 字` }, { value: 'ZCOOL KuaiLe', label: '站酷快乐体 · 活泼卡通' }, { value: 'Ma Shan Zheng', label: '马善政楷书 · 毛笔书法' }, { value: 'Zhi Mang Xing', label: '志莽行书 · 洒脱手写' }, { value: 'ZCOOL XiaoWei', label: '站酷小薇体 · 文艺标题' }]
 const fonts = ['StudioPingFang', 'StudioDisplay', 'PingFang SC', 'Songti SC', 'Kaiti SC', 'Heiti SC', 'Arial', 'sans-serif', 'serif']
 const dataURL = (file: File) => new Promise<string>((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(String(r.result)); r.onerror = reject; r.readAsDataURL(file) })

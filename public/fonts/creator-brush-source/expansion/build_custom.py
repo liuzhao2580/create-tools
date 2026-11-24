@@ -7,6 +7,10 @@ import numpy as np
 from fontTools.ttLib import TTFont
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools import subset
+from copy import deepcopy
+from fontTools.ttLib.tables._g_l_y_f import GlyphCoordinates
+from array import array
+from fontTools.pens.transformPen import TransformPen
 
 D = Path(__file__).resolve().parent
 FONT_DIR = D.parent.parent
@@ -20,6 +24,26 @@ for ch in manifest['approvedCharacters']:
     source = approved.getBestCmap()[ord(ch)]
     font['glyf'][name] = approved['glyf'][source]
     font['hmtx'][name] = approved['hmtx'][source]
+# Remove only the isolated scan speck above 下; retain every real stroke.
+def clean_xia(glyph, glyf):
+    glyph = deepcopy(glyph)
+    coords, ends, flags = glyph.getCoordinates(glyf)
+    kept, kept_flags, kept_ends = [], [], []
+    start = 0
+    for end in ends:
+        points = list(coords[start:end + 1])
+        if not (min(y for x, y in points) > 800 and max(x for x, y in points) - min(x for x, y in points) < 20):
+            kept.extend(points)
+            kept_flags.extend(flags[start:end + 1])
+            kept_ends.append(len(kept) - 1)
+        start = end + 1
+    glyph.coordinates = GlyphCoordinates(kept)
+    glyph.flags = array('B', kept_flags)
+    glyph.endPtsOfContours = kept_ends
+    glyph.numberOfContours = len(kept_ends)
+    glyph.recalcBounds(glyf)
+    return glyph
+font['glyf'][base_cmap[ord('下')]] = clean_xia(font['glyf'][base_cmap[ord('下')]], font['glyf'])
 # All remaining base glyphs are removed by the strict subset below.
 characters = manifest['approvedCharacters']
 assert len(set(characters)) == 52
@@ -71,11 +95,31 @@ for batch in manifest['batches']:
                 table.cmap[ord(ch)] = name
     characters += chars
     report.append({'batch': batch['id'], 'characters': chars, 'xBoundaries': xs, 'yBoundaries': ys})
+# Derive ASCII hyphen from the custom 一 stroke; retain its brush outline.
+source = font.getBestCmap()[ord('一')]
+glyph = font['glyf'][source]
+glyph.recalcBounds(font['glyf'])
+width = em * .40
+advance = round(em * .64)
+sx = width / (glyph.xMax - glyph.xMin)
+pen = TTGlyphPen(None)
+# Flatten the stroke vertically so a short hyphen is not a compressed ink blob.
+sy = .40
+transform = TransformPen(pen, (sx, 0, 0, sy, (advance - width) / 2 - glyph.xMin * sx, em * .255 - (glyph.yMin + glyph.yMax) / 2 * sy))
+font.getGlyphSet()[source].draw(transform)
+name = 'customHyphen'
+font.setGlyphOrder(font.getGlyphOrder() + [name])
+font['glyf'][name] = pen.glyph()
+font['hmtx'][name] = (advance, round((advance - width) / 2))
+for table in font['cmap'].tables:
+    if table.isUnicode():
+        table.cmap[ord('-')] = name
+punctuation = '-'
 options = subset.Options()
 options.name_IDs = ['*']
 options.name_legacy = True
 sub = subset.Subsetter(options=options)
-sub.populate(text=characters + ' ')
+sub.populate(text=characters + punctuation + ' ')
 sub.subset(font)
 names = {1:'Creator Brush Custom', 2:'Regular', 3:f"CreatorBrushCustom-{manifest['version']}", 4:'Creator Brush Custom', 6:'CreatorBrushCustom-Regular', 16:'Creator Brush Custom', 17:'Regular'}
 for rec in font['name'].names:
@@ -87,15 +131,18 @@ out = FONT_DIR / 'CreatorBrush-Custom.ttf'
 font.save(out)
 check = TTFont(out)
 cmap = check.getBestCmap()
-assert set(cmap) == {ord(ch) for ch in characters + ' '}
+assert set(cmap) == {ord(ch) for ch in characters + punctuation + ' '}
 assert all(check['glyf'][cmap[ord(ch)]].numberOfContours for ch in characters)
 # Confirm that the approved outlines survived without changes.
 approved = TTFont(D / 'CreatorBrush-Study-52.ttf')
 for ch in manifest['approvedCharacters']:
-    assert check['glyf'][cmap[ord(ch)]].getCoordinates(check['glyf']) == approved['glyf'][approved.getBestCmap()[ord(ch)]].getCoordinates(approved['glyf']), ch
-metadata = {'version':manifest['version'], 'count':len(characters), 'characters':characters, 'sha256':hashlib.sha256(out.read_bytes()).hexdigest(), 'complete':False}
+    expected = approved['glyf'][approved.getBestCmap()[ord(ch)]]
+    if ch == '下':
+        expected = clean_xia(expected, approved['glyf'])
+    assert check['glyf'][cmap[ord(ch)]].getCoordinates(check['glyf']) == expected.getCoordinates(approved['glyf']), ch
+metadata = {'version':manifest['version'] + '-hyphen5', 'punctuation':punctuation, 'count':len(characters), 'characters':characters, 'sha256':hashlib.sha256(out.read_bytes()).hexdigest(), 'complete':False}
 shared = ROOT / 'src/shared/fonts'
 shared.mkdir(parents=True, exist_ok=True)
 (shared / 'creator-brush-coverage.json').write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + '\n')
 (D / 'coverage-report.json').write_text(json.dumps({'font':metadata, 'batches':report}, ensure_ascii=False, indent=2) + '\n')
-print(f'Built {len(characters)} custom characters. Approved 52 outlines unchanged; no filler glyphs.')
+print(f'Built {len(characters)} custom characters. Approved outlines retained except the isolated 下 speck; no filler glyphs.')
