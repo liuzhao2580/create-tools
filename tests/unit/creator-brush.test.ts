@@ -2,6 +2,9 @@ import { describe,expect,it } from 'vitest'
 import { creatorBrushCharacters,creatorBrushCount,missingCreatorBrushCharacters } from '../../src/shared/fonts/creator-brush'
 
 describe('custom brush coverage', () => {
+  it('supports ASCII hyphens without changing the entered subtitle', () => {
+    expect(missingCreatorBrushCharacters('第二十一集-上')).toEqual([])
+  })
   it('supports the approved example and newly made common words', () => {
     expect(missingCreatorBrushCharacters('第十四集 人物故事\n信仰选择 命运真相\n我的生活 文字创作 定制毛笔体')).toEqual([])
     expect(new Set(creatorBrushCharacters).size).toBe(creatorBrushCount)
